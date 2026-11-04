@@ -8,6 +8,8 @@ ForgeFlow is a learning project and a growing collection of reusable GitHub Acti
 
 - `reusable-node-ci.yml` — checks out a Node.js project, installs dependencies, checks lint and types, runs tests and a build, and audits dependencies.
 - `examples/node-ci.yml` — a consumer workflow showing how another repository calls it.
+- `reusable-render-deploy.yml` — triggers a Render deployment using a deploy hook.
+- `examples/backend-render.yml` — a backend pipeline that runs CI before deploying to Render.
 
 ## Try the Node.js workflow
 
@@ -44,6 +46,19 @@ For example, a project can define scripts like these in `package.json` (choose t
 ```
 
 Pin the `uses` reference to a release tag or commit SHA for production use; `@main` is convenient while learning and iterating.
+
+## Continuous deployment: Render and Netlify
+
+The backend example runs CI for pull requests and pushes to `main`. A production deploy runs only for a push to `main`, and only after the CI job passes.
+
+### Backend to Render
+
+1. Connect the backend repository to a Render Web Service and configure its build/start commands and deploy branch (`main`).
+2. In Render, create a deploy hook for that service and copy its URL.
+3. In the backend GitHub repository, add an Actions secret named `RENDER_DEPLOY_HOOK_URL` containing the hook URL.
+4. Copy `examples/backend-render.yml` to `.github/workflows/deploy.yml` in the backend repository.
+
+When CI passes on a push to `main`, ForgeFlow sends a POST request to the hook. Render then builds and deploys the latest commit on its configured branch. Keep Render automatic deploys disabled if you want this workflow to be the single deployment trigger.
 
 ## How reusable workflows work
 

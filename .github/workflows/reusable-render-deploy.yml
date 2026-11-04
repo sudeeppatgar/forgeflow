@@ -1,0 +1,25 @@
+name: Reusable Render deployment
+
+on:
+  workflow_call:
+    secrets:
+      RENDER_DEPLOY_HOOK_URL:
+        description: Render deploy hook URL for the backend service
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy backend to Render
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Render deployment
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: >-
+          curl --fail-with-body --silent --show-error
+          --retry 3 --retry-delay 5 --retry-all-errors
+          --request POST "$RENDER_DEPLOY_HOOK_URL"
