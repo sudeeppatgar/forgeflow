@@ -8,14 +8,20 @@ on:
         required: false
         type: string
         default: '22'
+      run-audit:
+        description: Run npm audit and fail on high or critical vulnerabilities
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
 
 jobs:
   test:
-    name: Test (Node ${{ inputs.node-version }})
+    name: Quality checks (Node ${{ inputs.node-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out caller repository
         uses: actions/checkout@v4
@@ -29,5 +35,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check lint rules
+        run: npm run lint --if-present
+
+      - name: Check types
+        run: npm run typecheck --if-present
+
       - name: Run tests
         run: npm test --if-present
+
+      - name: Build project
+        run: npm run build --if-present
+
+      - name: Audit dependencies
+        if: ${{ inputs.run-audit }}
+        run: npm audit --audit-level=high
