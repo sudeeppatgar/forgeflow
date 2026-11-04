@@ -24,6 +24,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -51,7 +52,7 @@ Pin the `uses` reference to a release tag or commit SHA for production use; `@ma
 
 ## Continuous deployment: Render and Netlify
 
-The backend example runs CI for pull requests and pushes to `main`. A production deploy runs only for a push to `main`, and only after the CI job passes.
+The examples run CI for pull requests, pushes to `main`, and manual runs. In GitHub Actions, choose **Run workflow** and select a branch to run CI against it. Production deployment happens only on a push to `main`, after CI passes; manual runs on other branches do not deploy.
 
 ### Backend to Render
 
