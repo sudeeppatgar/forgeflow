@@ -28,7 +28,7 @@ jobs:
       node-version: '22'
 ```
 
-The called workflow expects a `package-lock.json` and a working `npm test` script. Pin the `uses` reference to a release tag or commit SHA for production use; `@main` is convenient while learning and iterating.
+The called workflow expects a `package-lock.json`. It runs `npm test --if-present`: if the project defines a `test` script in `package.json`, npm runs it; otherwise npm skips it. A skipped test step passes without actually running tests. Pin the `uses` reference to a release tag or commit SHA for production use; `@main` is convenient while learning and iterating.
 
 ## How reusable workflows work
 
