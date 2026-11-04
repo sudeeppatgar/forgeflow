@@ -1,0 +1,53 @@
+name: Reusable Netlify deployment
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version used to build the frontend
+        required: false
+        type: string
+        default: '22'
+      publish-dir:
+        description: Directory containing the built frontend
+        required: false
+        type: string
+        default: dist
+    secrets:
+      NETLIFY_AUTH_TOKEN:
+        description: Netlify personal access token
+        required: true
+      NETLIFY_SITE_ID:
+        description: Netlify site identifier
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and deploy frontend to Netlify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out caller repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Deploy to Netlify production
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_PUBLISH_DIR: ${{ inputs.publish-dir }}
+        run: npm exec -- netlify deploy --prod --dir="$NETLIFY_PUBLISH_DIR" --site="$NETLIFY_SITE_ID"

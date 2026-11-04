@@ -10,6 +10,8 @@ ForgeFlow is a learning project and a growing collection of reusable GitHub Acti
 - `examples/node-ci.yml` — a consumer workflow showing how another repository calls it.
 - `reusable-render-deploy.yml` — triggers a Render deployment using a deploy hook.
 - `examples/backend-render.yml` — a backend pipeline that runs CI before deploying to Render.
+- `reusable-netlify-deploy.yml` — builds a frontend and publishes it to Netlify.
+- `examples/frontend-netlify.yml` — a frontend pipeline that runs CI before deploying to Netlify.
 
 ## Try the Node.js workflow
 
@@ -59,6 +61,15 @@ The backend example runs CI for pull requests and pushes to `main`. A production
 4. Copy `examples/backend-render.yml` to `.github/workflows/deploy.yml` in the backend repository.
 
 When CI passes on a push to `main`, ForgeFlow sends a POST request to the hook. Render then builds and deploys the latest commit on its configured branch. Keep Render automatic deploys disabled if you want this workflow to be the single deployment trigger.
+
+### Frontend to Netlify
+
+1. In Netlify, create a site and note its Site ID. Create a personal access token for deployments.
+2. In the frontend GitHub repository, add Actions secrets named `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` with those values.
+3. Ensure the frontend has a build script (for example, `"build": "vite build"`) and that the Netlify CLI is in its lockfile: `npm install --save-dev netlify-cli`.
+4. Copy `examples/frontend-netlify.yml` to `.github/workflows/deploy.yml` in the frontend repository. Set `publish-dir` to the build output directory (commonly `dist` for Vite or `build` for Create React App).
+
+When CI passes on a push to `main`, ForgeFlow installs the project dependencies, builds the frontend, and publishes that directory to Netlify production. The token and site ID are passed as GitHub Actions secrets and are not stored in the workflow.
 
 ## How reusable workflows work
 
